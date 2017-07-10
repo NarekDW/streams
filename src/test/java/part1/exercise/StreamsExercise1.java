@@ -1,6 +1,7 @@
 package part1.exercise;
 
 import data.Employee;
+import data.Generator;
 import data.JobHistoryEntry;
 import data.Person;
 import org.junit.Test;
@@ -15,6 +16,8 @@ import static data.Generator.generateEmployeeList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class StreamsExercise1 {
     // https://youtu.be/kxgo7Y4cdA8 Сергей Куксенко и Алексей Шипилёв — Через тернии к лямбдам, часть 1
@@ -25,8 +28,25 @@ public class StreamsExercise1 {
 
     @Test
     public void getAllEpamEmployees() {
-        List<Person> epamEmployees = null;// TODO all persons with experience in epam
-        throw new UnsupportedOperationException();
+        List<Employee> initial = Generator.generateEmployeeList();
+
+        List<Person> epamEmployees =
+                initial.stream()
+                        .filter(e -> e.getJobHistory().stream()
+                                .anyMatch(j -> j.getEmployer().equals("epam")))
+                        .map(Employee::getPerson)
+                        .collect(toList());
+
+        epamEmployees.forEach(person ->
+                initial.forEach(employee -> {
+                    if (employee.getPerson().equals(person))
+                        assertTrue(
+                                employee.getJobHistory().stream()
+                                        .anyMatch(job ->
+                                                job.getEmployer().equals("epam")));
+                })
+        );
+
     }
 
     @Test
